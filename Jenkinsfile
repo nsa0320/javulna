@@ -16,41 +16,41 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'develop',
-                    url: 'https://github.com/nsa0320/WebGoat-file.git',
+                    url: 'https://github.com/nsa0320/javulna.git',  // ✅ 여기만 변경
                     credentialsId: '1'
             }
         }
 
         stage('Semgrep Analysis via Lambda') {
-    steps {
-        script {
-            def START = System.currentTimeMillis()
+            steps {
+                script {
+                    def START = System.currentTimeMillis()
 
-            sh '''
-                echo "[📦] 소스코드 압축 중..."
-                zip -r source.zip . -x "*.git*" "*.idea*" "target/*"
+                    sh '''
+                        echo "[📦] 소스코드 압축 중..."
+                        zip -r source.zip . -x "*.git*" "*.idea*" "target/*"
 
-                echo "[☁️] S3에 업로드 중..."
-                aws s3 cp source.zip s3://$S3_BUCKET/source.zip
+                        echo "[☁️] S3에 업로드 중..."
+                        aws s3 cp source.zip s3://$S3_BUCKET/source.zip
 
-                echo "[🚀] Lambda로 Semgrep 실행 요청 중..."
-                aws lambda invoke \
-                  --function-name trigger-semgrep-analysis-ssm \
-                  --payload '{"s3_key":"source.zip"}' \
-                  --region $AWS_REGION \
-                  --cli-binary-format raw-in-base64-out \
-                  lambda_output.json
+                        echo "[🚀] Lambda로 Semgrep 실행 요청 중..."
+                        aws lambda invoke \
+                          --function-name trigger-semgrep-analysis-ssm \
+                          --payload '{"s3_key":"source.zip"}' \
+                          --region $AWS_REGION \
+                          --cli-binary-format raw-in-base64-out \
+                          lambda_output.json
 
-                echo "[📄] Lambda 응답 내용:"
-                cat lambda_output.json
-            '''
+                        echo "[📄] Lambda 응답 내용:"
+                        cat lambda_output.json
+                    '''
 
-            def END = System.currentTimeMillis()
-            def durationSeconds = (END - START) / 1000.0
-            echo "⏱️ Semgrep 분석 총 소요 시간: ${durationSeconds}초"
+                    def END = System.currentTimeMillis()
+                    def durationSeconds = (END - START) / 1000.0
+                    echo "⏱️ Semgrep 분석 총 소요 시간: ${durationSeconds}초"
+                }
+            }
         }
-    }
-}
 
         stage('Build JAR') {
             steps {
@@ -78,7 +78,7 @@ pipeline {
             }
         }
 
-                stage('Publish Semgrep Report') {
+        stage('Publish Semgrep Report') {
             steps {
                 publishHTML([
                     reportDir: '.', 
