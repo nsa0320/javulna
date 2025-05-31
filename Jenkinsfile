@@ -14,8 +14,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'develop',
-                    url: 'https://github.com/nsa0320/WebGoat-file.git',
+                git branch: 'main',
+                    url: 'https://github.com/nsa0320/javulna.git',
                     credentialsId: '1'
             }
         }
