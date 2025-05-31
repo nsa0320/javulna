@@ -1,0 +1,33 @@
+import json
+import html
+
+with open("semgrep-result.json", encoding="utf-8") as f:
+    data = json.load(f)
+
+html_report = """
+<html>
+<head><meta charset="utf-8"><title>Semgrep Report</title></head>
+<body>
+<h1>Semgrep 분석 결과 (총 {count}건)</h1>
+<table border="1" cellpadding="5" cellspacing="0">
+<tr>
+<th>#</th>
+<th>취약점 ID</th>
+<th>메시지</th>
+<th>파일</th>
+<th>라인</th>
+</tr>
+""".format(count=len(data.get("results", [])))
+
+for i, r in enumerate(data.get("results", []), 1):
+    check_id = html.escape(r.get("check_id", ""))
+    message = html.escape(r.get("message", ""))
+    path = html.escape(r.get("path", ""))
+    line = r.get("start", {}).get("line", "?")
+
+    html_report += f"<tr><td>{i}</td><td>{check_id}</td><td>{message}</td><td>{path}</td><td>{line}</td></tr>"
+
+html_report += "</table></body></html>"
+
+with open("semgrep-report.html", "w", encoding="utf-8") as out:
+    out.write(html_report)
