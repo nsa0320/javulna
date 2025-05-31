@@ -1,6 +1,6 @@
 import json
 
-with open("result.json", "r") as f:
+with open("semgrep-result.json", "r") as f:
     data = json.load(f)
 
 html = "<html><head><title>Semgrep Report</title></head><body>"
@@ -12,5 +12,5 @@ for finding in data.get("results", []):
 
 html += "</ul></body></html>"
 
-with open("report.html", "w") as f:
+with open("semgrep-report.html", "w") as f:
     f.write(html)
