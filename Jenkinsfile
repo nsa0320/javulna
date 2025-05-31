@@ -14,6 +14,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                deleteDir()
                 git branch: 'main',
                     url: 'https://github.com/nsa0320/javulna.git',
                     credentialsId: '1'
