@@ -55,36 +55,6 @@ pipeline {
             }
         }
 
-        stage('Wait for CodeQL SARIF') {
-            steps {
-                script {
-                    echo "[⏳] SARIF 결과 생성 대기 중..."
-                    def retries = 60  // 최대 10분 대기
-                    def interval = 10 // 초 단위
-                    def fileFound = false
-
-                    for (int i = 0; i < retries; i++) {
-                        def result = sh(
-                            script: "aws s3 ls s3://$S3_BUCKET/result/result.sarif",
-                            returnStatus: true
-                        )
-                        if (result == 0) {
-                            echo "[✅] result.sarif 파일이 확인되었습니다."
-                            fileFound = true
-                            break
-                        } else {
-                            echo "[⏱️] 아직 result.sarif 없음. ${interval}초 후 재시도..."
-                            sleep(interval)
-                        }
-                    }
-
-                    if (!fileFound) {
-                        error("❌ result.sarif 파일을 ${retries * interval}초 동안 찾지 못했습니다.")
-                    }
-                }
-            }
-        }
-
         stage('Download and Publish CodeQL Report') {
             steps {
                 sh """
