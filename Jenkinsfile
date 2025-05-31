@@ -8,14 +8,15 @@ pipeline {
         S3_BUCKET = 'webgoat-nsa'
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'develop',
-                    url: 'https://github.com/nsa0320/javulna.git',
-                    credentialsId: '1'
-            }
-        }
+    stage('Checkout') {
+    steps {
+        deleteDir() // ✅ 이전 WebGoat 코드 등 모두 정리
+
+        git branch: 'develop',
+            url: 'https://github.com/nsa0320/javulna.git',
+            credentialsId: '1'
+    }
+}
 
         stage('Semgrep Analysis via Lambda') {
             steps {
