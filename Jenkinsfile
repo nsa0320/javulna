@@ -5,18 +5,14 @@ pipeline {
         AWS_REGION = 'ap-northeast-2'
         AWS_ACCESS_KEY_ID = credentials('ecr-login')
         AWS_SECRET_ACCESS_KEY = credentials('ecr-login')
-        ECR_REGISTRY = '341162387145.dkr.ecr.ap-northeast-2.amazonaws.com'
-        APP_REPO_NAME = 'nsa'
         S3_BUCKET = 'webgoat-nsa'
-        CONTAINER_NAME = 'dummy'
-        CONTAINER_PORT = 8080
     }
 
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'develop',
-                    url: 'https://github.com/nsa0320/javulna.git',  // ✅ 여기만 변경
+                    url: 'https://github.com/nsa0320/javulna.git',
                     credentialsId: '1'
             }
         }
@@ -52,20 +48,6 @@ pipeline {
             }
         }
 
-        stage('Build JAR') {
-            steps {
-                sh 'mvn clean package -DskipTests'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh '''
-                    docker build --force-rm -t $ECR_REGISTRY/$APP_REPO_NAME:latest .
-                '''
-            }
-        }
-
         stage('Download and Visualize Semgrep Result') {
             steps {
                 sh '''
@@ -93,15 +75,11 @@ pipeline {
     }
 
     post {
-        always {
-            echo '🧹 Cleaning up local Docker images...'
-            sh 'docker image prune -af'
-        }
         success {
-            echo '✅ Pipeline succeeded with Semgrep visualization!'
+            echo '✅ Semgrep 리포트 생성 완료!'
         }
         failure {
-            echo '❌ Pipeline failed. Check logs!'
+            echo '❌ 실패! 로그 확인 필요.'
         }
     }
 }
